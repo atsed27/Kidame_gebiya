@@ -8,6 +8,7 @@ import React, { useContext } from 'react';
 
 function ProductDetail() {
   const { state, dispatch } = useContext(Store);
+  const router = useRouter();
   const { query } = useRouter();
   const { slug } = query;
   const product = data.products.find((x) => x.slug === slug);
@@ -21,6 +22,7 @@ function ProductDetail() {
       return;
     }
     dispatch({ type: 'CART_ADD_ITEM', payload: { ...product, quantity } });
+    router.push('/cart');
   };
 
   return (
