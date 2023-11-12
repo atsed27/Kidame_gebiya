@@ -3,8 +3,14 @@
 @tailwind utilities;
 
 .card {
-  @apply mb-5 block rounded-lg border border-gray-200 shadow-md;
+  @apply block mb-5 border border-gray-200 rounded-lg shadow-md;
 }
 .primary-button {
-  @apply rounded bg-amber-300 py-2 px-4 shadow outline-none hover:bg-amber-400 active:bg-amber-500;
+  @apply px-4 py-2 rounded shadow outline-none bg-amber-300 hover:bg-amber-400 active:bg-amber-500;
+}
+
+input,
+textarea,
+select {
+  @apply p-2 border rounded outline-none ring-gray-300 focus:ring;
 }
