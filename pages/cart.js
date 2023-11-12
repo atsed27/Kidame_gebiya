@@ -7,13 +7,18 @@ import React, { useContext } from 'react';
 
 function CartScreen() {
   const { state, dispatch } = useContext(Store);
+  const router = useRouter();
   const {
     cart: { cartItem },
   } = state;
   const removeHandler = (item) => {
     dispatch({ type: 'CART_REMOVE_ITEM', payload: item });
   };
-  const router = useRouter();
+  const updateCartHandler = (item, num) => {
+    const quantity = Number(num);
+    dispatch({ type: 'CART_ADD_ITEM', payload: { ...item, quantity } });
+  };
+
   return (
     <Layout title={'shopping Cart'}>
       <h1 className="mb-4 text-xl">Shopping cart</h1>
@@ -22,7 +27,7 @@ function CartScreen() {
           cart is empty .<Link href={'/'}>Go to shopping</Link>
         </div>
       ) : (
-        <div className="grid md:grid-cols-4 md:gap-5">
+        <div className="grid gap-3 md:grid-cols-4 md:gap-5">
           <div className="md:col-span-3">
             <table className="min-w-full">
               <thead className="border-b">
@@ -51,7 +56,21 @@ function CartScreen() {
                         {item.name}
                       </Link>
                     </td>
-                    <td className="p-5 text-right">{item.quantity}</td>
+                    <td className="p-5 text-right">
+                      <select
+                        className="bg-white"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          updateCartHandler(item, e.target.value)
+                        }
+                      >
+                        {[...Array(item.countInStock).keys()].map((x) => (
+                          <option key={x + 1} value={x + 1}>
+                            {x + 1}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
                     <td className="p-5 text-right">{item.price}</td>
                     <td className="p-5 text-center">
                       <button onClick={() => removeHandler(item)}>x</button>
