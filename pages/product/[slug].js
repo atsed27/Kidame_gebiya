@@ -1,15 +1,28 @@
 import Layout from '@/components/Layout';
+import { Store } from '@/utils/Store';
 import data from '@/utils/data';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useContext } from 'react';
 
 function ProductDetail() {
+  const { state, dispatch } = useContext(Store);
   const { query } = useRouter();
   const { slug } = query;
   const product = data.products.find((x) => x.slug === slug);
   if (!product) return <div> Product is not found</div>;
+
+  const addToCart = () => {
+    const existItem = state.cart.cartItem.find((x) => x.name === product.name);
+    const quantity = existItem ? existItem.quantity + 1 : 1;
+    if (product.countInStock < quantity) {
+      alert('sorry product is out of stack');
+      return;
+    }
+    dispatch({ type: 'CART_ADD_ITEM', payload: { ...product, quantity } });
+  };
+
   return (
     <Layout title={product.name}>
       <div className="py-2">
@@ -48,7 +61,9 @@ function ProductDetail() {
               <div>status</div>
               <div>{product.countInStock > 0 ? 'InStack' : 'Unavailable'}</div>
             </div>
-            <button className="w-full primary-button">Add to cart</button>
+            <button onClick={addToCart} className="w-full primary-button">
+              Add to cart
+            </button>
           </div>
         </div>
       </div>
