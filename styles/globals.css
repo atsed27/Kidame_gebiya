@@ -14,3 +14,11 @@ textarea,
 select {
   @apply p-2 border rounded outline-none ring-gray-300 focus:ring;
 }
+
+.dropdown-link {
+  @apply flex p-2 hover:bg-gray-200;
+}
+
+.top {
+  @apply text-blue-600 hover:text-blue-800;
+}
