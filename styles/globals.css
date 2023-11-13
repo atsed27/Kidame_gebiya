@@ -8,7 +8,9 @@
 .primary-button {
   @apply px-4 py-2 rounded shadow outline-none bg-amber-300 hover:bg-amber-400 active:bg-amber-500;
 }
-
+.default-button {
+  @apply px-4 py-2 bg-gray-100 rounded shadow outline-none hover:bg-gray-200 active:bg-gray-200;
+}
 input,
 textarea,
 select {
