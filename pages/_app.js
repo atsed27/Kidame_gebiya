@@ -1,6 +1,7 @@
 import '@/styles/globals.css';
 import { StoreProvider } from '@/utils/Store';
-import { SessionProvider } from 'next-auth/react';
+import { SessionProvider, useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
@@ -8,8 +9,28 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <StoreProvider>
-        <Component {...pageProps} />
+        {Component.auth ? (
+          <Auth>
+            <Component {...pageProps} />
+          </Auth>
+        ) : (
+          <Component {...pageProps} />
+        )}
       </StoreProvider>
     </SessionProvider>
   );
+}
+
+function Auth({ children }) {
+  const router = useRouter();
+  const { status } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push('/login');
+    },
+  });
+  if (status === 'loading') {
+    return <div className="">Loading</div>;
+  }
+  return children;
 }

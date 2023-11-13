@@ -6,7 +6,7 @@ export const Store = createContext();
 const initialState = {
   cart: Cookies.get('cart')
     ? JSON.parse(Cookies.get('cart'))
-    : { cartItem: [] },
+    : { cartItem: [], shippingAddress: {} },
 };
 
 function reducer(state, action) {
@@ -31,13 +31,16 @@ function reducer(state, action) {
       Cookies.set('cart', JSON.stringify({ ...state.cart, cartItem }));
       return { ...state, cart: { ...state.cart, cartItem } };
     }
-    case 'CART_REST': {
+
+    case 'SAVE_SHIPPING_ADDRESS': {
       return {
         ...state,
         cart: {
-          cartItem: [],
-          shippingAddress: { location: {} },
-          paymentMethod: '',
+          ...state.cart,
+          shippingAddress: {
+            ...state.cart.shippingAddress,
+            ...action.payload,
+          },
         },
       };
     }
@@ -51,5 +54,6 @@ function reducer(state, action) {
 export function StoreProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const value = { state, dispatch };
+  console.log(value);
   return <Store.Provider value={value}>{children}</Store.Provider>;
 }
