@@ -11,12 +11,12 @@ function Login() {
   const { data: session } = useSession();
   const router = useRouter();
   console.log(router);
-  const { redirects } = router.query;
+  const { redirect } = router.query;
   useEffect(() => {
     if (session?.user) {
-      router.push(redirects || '/');
+      router.push(redirect || '/');
     }
-  }, [router, session, redirects]);
+  }, [router, session, redirect]);
 
   const {
     handleSubmit,
