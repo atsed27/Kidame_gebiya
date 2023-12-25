@@ -6,11 +6,12 @@ import db from '@/utils/db';
 import axios from 'axios';
 import { useContext } from 'react';
 import { toast } from 'react-toastify';
-
+import { useSession } from 'next-auth/react';
 export default function Home({ products }) {
   const { state, dispatch } = useContext(Store);
   const { cart } = state;
-
+  const { data: session } = useSession();
+  console.log(session);
   const addToCart = async (product) => {
     const existItem = cart.cartItem.find((x) => x.name === product.name);
     const quantity = existItem ? existItem.quantity + 1 : 1;
@@ -40,7 +41,6 @@ export default function Home({ products }) {
 export async function getServerSideProps() {
   await db.connect();
   const products = await Products.find().lean();
-  console.log(products);
   return {
     props: {
       products: products.map(db.convertDocToObj),

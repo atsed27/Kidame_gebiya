@@ -9,8 +9,8 @@ import { useRouter } from 'next/router';
 
 function Login() {
   const { data: session } = useSession();
+  console.log(session);
   const router = useRouter();
-  console.log(router);
   const { redirect } = router.query;
   useEffect(() => {
     if (session?.user) {
