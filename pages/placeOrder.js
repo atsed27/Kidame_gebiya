@@ -46,7 +46,7 @@ export default function PlaceOrderScreen() {
         taxPrice,
         totalPrice,
       });
-      console.log({ data });
+
       setLoading(false);
       dispatch({ type: 'CART_CLEAR_ITEMS' });
       Cookies.set(
@@ -56,7 +56,7 @@ export default function PlaceOrderScreen() {
           cartItem: [],
         })
       );
-      router.push(`/order/${data._id}`);
+      console.log(data);
     } catch (err) {
       setLoading(false);
       return toast.error(getError(err));
@@ -74,7 +74,7 @@ export default function PlaceOrderScreen() {
       ) : (
         <div className="grid md:grid-cols-4 md:gap-5">
           <div className="overflow-x-auto md:col-span-3">
-            <div className="card  p-5">
+            <div className="p-5 card">
               <h2 className="mb-2 text-lg">Shipping Address</h2>
               <div>
                 {shippingAddress.fullName}, {shippingAddress.address},{' '}
@@ -85,21 +85,21 @@ export default function PlaceOrderScreen() {
                 <Link href="/shipping">Edit</Link>
               </div>
             </div>
-            <div className="card  p-5">
+            <div className="p-5 card">
               <h2 className="mb-2 text-lg">Payment Method</h2>
               <div>{paymentMethod}</div>
               <div>
                 <Link href="/payment">Edit</Link>
               </div>
             </div>
-            <div className="card overflow-x-auto p-5">
+            <div className="p-5 overflow-x-auto card">
               <h2 className="mb-2 text-lg">Order Items</h2>
               <table className="min-w-full">
                 <thead className="border-b">
                   <tr>
                     <th className="px-5 text-left">Item</th>
-                    <th className="    p-5 text-right">Quantity</th>
-                    <th className="  p-5 text-right">Price</th>
+                    <th className="p-5 text-right ">Quantity</th>
+                    <th className="p-5 text-right ">Price</th>
                     <th className="p-5 text-right">Subtotal</th>
                   </tr>
                 </thead>
@@ -124,7 +124,7 @@ export default function PlaceOrderScreen() {
                           {item.name}
                         </Link>
                       </td>
-                      <td className=" p-5 text-right">{item.quantity}</td>
+                      <td className="p-5 text-right ">{item.quantity}</td>
                       <td className="p-5 text-right">${item.price}</td>
                       <td className="p-5 text-right">
                         ${item.quantity * item.price}
@@ -139,29 +139,29 @@ export default function PlaceOrderScreen() {
             </div>
           </div>
           <div>
-            <div className="card  p-5">
+            <div className="p-5 card">
               <h2 className="mb-2 text-lg">Order Summary</h2>
               <ul>
                 <li>
-                  <div className="mb-2 flex justify-between">
+                  <div className="flex justify-between mb-2">
                     <div>Items</div>
                     <div>${itemsPrice}</div>
                   </div>
                 </li>
                 <li>
-                  <div className="mb-2 flex justify-between">
+                  <div className="flex justify-between mb-2">
                     <div>Tax</div>
                     <div>${taxPrice}</div>
                   </div>
                 </li>
                 <li>
-                  <div className="mb-2 flex justify-between">
+                  <div className="flex justify-between mb-2">
                     <div>Shipping</div>
                     <div>${shippingPrice}</div>
                   </div>
                 </li>
                 <li>
-                  <div className="mb-2 flex justify-between">
+                  <div className="flex justify-between mb-2">
                     <div>Total</div>
                     <div>${totalPrice}</div>
                   </div>
@@ -170,7 +170,7 @@ export default function PlaceOrderScreen() {
                   <button
                     disabled={loading}
                     onClick={placeOrderHandler}
-                    className="primary-button w-full"
+                    className="w-full primary-button"
                   >
                     {loading ? 'Loading...' : 'Place Order'}
                   </button>

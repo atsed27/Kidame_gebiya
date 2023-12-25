@@ -9,7 +9,6 @@ import { useRouter } from 'next/router';
 
 function Login() {
   const { data: session } = useSession();
-  console.log(session);
   const router = useRouter();
   const { redirect } = router.query;
   useEffect(() => {
@@ -31,6 +30,7 @@ function Login() {
         email,
         password,
       });
+      console.log(result);
       if (result.error) {
         toast.error(result.error);
       }

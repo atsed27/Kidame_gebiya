@@ -1,13 +1,40 @@
-import Users from '@/model/User';
 import db from '@/utils/db';
 import NextAuth from 'next-auth/next';
-import bcryptjs from 'bcryptjs';
+import { compare } from 'bcryptjs';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import User from '@/model/User';
 
 export default NextAuth({
+  providers: [
+    CredentialsProvider({
+      async authorize(credentials) {
+        await db.connect();
+        const user = await User.findOne({
+          email: credentials.email,
+        });
+        if (!user) {
+          throw new Error('User is not found');
+        }
+
+        //check password
+        const checkPassword = await compare(
+          credentials.password,
+          user.password
+        );
+        if (!checkPassword) {
+          throw new Error('Password is incorrect');
+        }
+        return user;
+      },
+    }),
+  ],
+  pages: {
+    signIn: '/login',
+  },
   session: {
     strategy: 'jwt',
   },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user?._id) token._id = user._id;
@@ -20,29 +47,4 @@ export default NextAuth({
       return session;
     },
   },
-  providers: [
-    CredentialsProvider({
-      async authorize(credentials) {
-        await db.connect();
-        const user = await Users.findOne({
-          email: credentials.email,
-        });
-        await db.disconnect();
-        if (user && bcryptjs.compareSync(credentials.password, user.password)) {
-          return {
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            image: 'f',
-            isAdmin: user.isAdmin,
-          };
-        }
-        throw new Error('Invalid email or password');
-      },
-      credentials: {
-        sameSite: 'none',
-        secure: true,
-      },
-    }),
-  ],
 });
