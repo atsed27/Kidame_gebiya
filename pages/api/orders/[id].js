@@ -1,10 +1,9 @@
-import { unstable_getServerSession } from 'next-auth';
-import Nextauth from '../auth/[...nextauth]';
 import db from '@/utils/db';
 import Order from '@/model/Order';
+import { getSession } from 'next-auth/react';
 
 const Handler = async (req, res) => {
-  const session = await unstable_getServerSession(req, res, Nextauth);
+  const session = await getSession({ req });
   if (session === null) {
     return res.status(400).json('sign in requierd');
   }
