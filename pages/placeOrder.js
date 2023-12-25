@@ -46,7 +46,7 @@ export default function PlaceOrderScreen() {
         taxPrice,
         totalPrice,
       });
-
+      router.push(`/order/${data._id}`);
       setLoading(false);
       dispatch({ type: 'CART_CLEAR_ITEMS' });
       Cookies.set(

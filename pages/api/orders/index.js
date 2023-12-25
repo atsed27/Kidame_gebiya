@@ -1,5 +1,8 @@
 import { unstable_getServerSession } from 'next-auth';
 import Nextauth from '../auth/[...nextauth]';
+import User from '@/model/User';
+import db from '@/utils/db';
+import Order from '@/model/Order';
 
 const Handler = async (req, res) => {
   const session = await unstable_getServerSession(req, res, Nextauth);
@@ -7,7 +10,17 @@ const Handler = async (req, res) => {
   if (session === null) {
     return res.status(400).json('sign in requierd');
   }
-  return res.status(200).json('ok');
+  await db.connect();
+  const userFind = await User.findOne({ email: session.user.email });
+  if (!userFind) {
+    return res.status(404).json('user is not found');
+  }
+  const newOrder = new Order({
+    ...req.body,
+    user: userFind._id,
+  });
+  const order = await newOrder.save();
+  return res.status(201).json(order);
 };
 
 export default Handler;
