@@ -1,10 +1,11 @@
 import Order from '@/model/Order';
 import db from '@/utils/db';
-import { getSession } from 'next-auth/react';
-
+import { unstable_getServerSession } from 'next-auth';
+import Nextauth from '../../auth/[...nextauth]';
 const handler = async (req, res) => {
-  const session = await getSession({ req });
+  const session = await unstable_getServerSession(req, res, Nextauth);
   if (session === null) {
+    console.log('seesion error');
     return res.status(400).json('sign in requierd');
   }
   console.log('adniel4');
