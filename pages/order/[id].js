@@ -30,6 +30,7 @@ function reducer(state, action) {
 }
 
 function OrderScreen() {
+  const router = useRouter();
   const { state } = useContext(Store);
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
   const { query } = useRouter();
@@ -131,6 +132,16 @@ function OrderScreen() {
   function onError(error) {
     toast.error(getError(error));
   }
+  const chapaHandler = async () => {
+    try {
+      const res = await axios.post(`/api/chapa/${order._id}`, order);
+      console.log(res.data.data);
+      router.push(res.data.data.checkout_url);
+    } catch (error) {
+      console.log(error);
+      toast.error(getError(error));
+    }
+  };
   return (
     <Layout title={'order'}>
       <h1 className="mb-4 text text-xl">Order {orderId} </h1>
@@ -242,7 +253,7 @@ function OrderScreen() {
                     <div> ${totalPrice} </div>
                   </div>
                 </li>
-                {!isPaid && (
+                {!isPaid && paymentMethod === 'paypal' && (
                   <li>
                     {isPending ? (
                       <div>Loading ...</div>
@@ -257,6 +268,14 @@ function OrderScreen() {
                     )}
                     {loadingPay && <div>Loading...</div>}
                   </li>
+                )}
+                {!isPaid && paymentMethod === 'Chapa' && (
+                  <button
+                    onClick={chapaHandler}
+                    className="w-full primary-button text-center"
+                  >
+                    Pay with Chapa{' '}
+                  </button>
                 )}
               </ul>
             </div>
