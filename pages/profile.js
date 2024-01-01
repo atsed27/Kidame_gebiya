@@ -16,9 +16,9 @@ function Profile() {
   } = useForm();
 
   useEffect(() => {
-    setValue('name', session.user.name);
-    setValue('email', session.user.email);
-  }, [session.user, setValue]);
+    setValue('name', session?.user.name);
+    setValue('email', session?.user.email);
+  }, [session?.user, setValue]);
   const submitHandler = async ({ name, email, password }) => {
     try {
       await axios.put('/api/auth/update', {
