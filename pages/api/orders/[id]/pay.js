@@ -7,6 +7,7 @@ const handler = async (req, res) => {
   if (session === null) {
     return res.status(400).json('sign in requierd');
   }
+  console.log('adniel4');
   await db.connect();
   const order = await Order.findById(req.query.id);
   if (order) {

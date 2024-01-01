@@ -5,7 +5,8 @@ import axios from 'axios';
 import { getError } from '@/utils/error';
 import Link from 'next/link';
 import Image from 'next/image';
-
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import { toast } from 'react-toastify';
 function reducer(state, action) {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -14,19 +15,27 @@ function reducer(state, action) {
       return { ...state, loading: false, order: action.payload, error: '' };
     case 'FETCH_FILER':
       return { ...state, loading: false, error: action.payload };
+    case 'PAY_REQUEST':
+      return { ...state, loadingPay: true };
+    case 'PAY_SUCCESS':
+      return { ...state, loadingPay: false, successPay: true };
+    case 'PAY_FAIL':
+      return { ...state, loadingPay: false, errorPay: action.payload };
     default:
       state;
   }
 }
 
 function OrderScreen() {
+  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
   const { query } = useRouter();
   const orderId = query.id;
-  const [{ loading, error, order }, dispatch] = useReducer(reducer, {
-    loading: true,
-    error: '',
-    order: {},
-  });
+  const [{ loading, error, order, successPay, loadingPay }, dispatch] =
+    useReducer(reducer, {
+      loading: true,
+      error: '',
+      order: {},
+    });
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -39,10 +48,26 @@ function OrderScreen() {
         dispatch({ type: 'FETCH_FILER', payload: getError(error) });
       }
     };
-    if (!order._id || (order._id && order._id !== orderId)) {
+    if (!order._id || successPay || (order._id && order._id !== orderId)) {
       fetchOrder();
+      if (successPay) {
+        dispatch({ type: 'PAY_REST' });
+      }
+    } else {
+      const loadPaypalScript = async () => {
+        const { data: ClientId } = await axios.get('/api/keys/paypal');
+        paypalDispatch({
+          type: 'resetOptions',
+          value: {
+            'client-id': ClientId,
+            currency: 'USD',
+          },
+        });
+        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+      };
+      loadPaypalScript();
     }
-  }, [order._id, orderId]);
+  }, [order._id, orderId, paypalDispatch, successPay]);
 
   const {
     shippingAddress,
@@ -58,6 +83,39 @@ function OrderScreen() {
     totalPrice,
   } = order;
 
+  function createOrder(data, actions) {
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            amount: { value: totalPrice },
+          },
+        ],
+      })
+      .then((orderId) => {
+        return orderId;
+      });
+  }
+  function onApprove(data, actions) {
+    return actions.order.capture().then(async function (details) {
+      try {
+        dispatch({ type: 'PAY_REQUEST' });
+
+        const { data } = await axios.put(
+          `/api/orders/${order._id}/pay`,
+          details
+        );
+        dispatch({ type: 'PAY_SUCCESS', payload: data });
+        toast.success('Order is paid successfully');
+      } catch (error) {
+        dispatch({ type: 'PAY_FAIL', payload: getError(error) });
+        toast.error(getError(error));
+      }
+    });
+  }
+  function onError(error) {
+    toast.error(getError(error));
+  }
   return (
     <Layout title={'order'}>
       <h1 className="mb-4 text text-xl">Order {orderId} </h1>
@@ -169,6 +227,22 @@ function OrderScreen() {
                     <div> ${totalPrice} </div>
                   </div>
                 </li>
+                {!isPaid && (
+                  <li>
+                    {isPending ? (
+                      <div>Loading ...</div>
+                    ) : (
+                      <div>
+                        <PayPalButtons
+                          createOrder={createOrder}
+                          onApprove={onApprove}
+                          onError={onError}
+                        ></PayPalButtons>
+                      </div>
+                    )}
+                    {loadingPay && <div>Loading...</div>}
+                  </li>
+                )}
               </ul>
             </div>
           </div>
