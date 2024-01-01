@@ -10,6 +10,7 @@ const Handler = async (req, res) => {
   if (session === null) {
     return res.status(400).json('sign in requierd');
   }
+
   await db.connect();
   const userFind = await User.findOne({ email: session.user.email });
   if (!userFind) {

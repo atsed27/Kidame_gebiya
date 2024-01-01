@@ -24,6 +24,16 @@ function reducer(state, action) {
       Cookies.set('cart', JSON.stringify({ ...state.cart, cartItem }));
       return { ...state, cart: { ...state.cart, cartItem } };
     }
+    case 'CART_RESET': {
+      return {
+        ...state,
+        cart: {
+          shippingAddress: { location: {} },
+        },
+        cartItem: [],
+        paymentMethod: '',
+      };
+    }
     case 'CART_REMOVE_ITEM': {
       const cartItem = state.cart.cartItem.filter(
         (item) => item.slug !== action.payload.slug
@@ -31,7 +41,9 @@ function reducer(state, action) {
       Cookies.set('cart', JSON.stringify({ ...state.cart, cartItem }));
       return { ...state, cart: { ...state.cart, cartItem } };
     }
-
+    case 'CART_CLEAR_ITEMS': {
+      return { ...state, cart: { ...state.cart, cartItem: [] } };
+    }
     case 'SAVE_SHIPPING_ADDRESS': {
       return {
         ...state,

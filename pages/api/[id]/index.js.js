@@ -8,10 +8,11 @@ const Handler = async (req, res) => {
     return res.status(400).json('sign in requierd');
   }
   await db.connect();
-
+  console.log('danie2');
   const order = await Order.findById(req.query.id);
   if (!order) return res.status(404).json('order is not found');
   await db.disconnect();
+  console.log(order);
   return res.status(201).json(order);
 };
 

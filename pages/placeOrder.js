@@ -46,6 +46,7 @@ export default function PlaceOrderScreen() {
         taxPrice,
         totalPrice,
       });
+      console.log(data);
       router.push(`/order/${data._id}`);
       setLoading(false);
       dispatch({ type: 'CART_CLEAR_ITEMS' });
@@ -59,7 +60,7 @@ export default function PlaceOrderScreen() {
       console.log(data);
     } catch (err) {
       setLoading(false);
-      return toast.error(getError(err));
+      toast.error(getError(err));
     }
   };
 
@@ -77,9 +78,9 @@ export default function PlaceOrderScreen() {
             <div className="p-5 card">
               <h2 className="mb-2 text-lg">Shipping Address</h2>
               <div>
-                {shippingAddress.fullName}, {shippingAddress.address},{' '}
-                {shippingAddress.city}, {shippingAddress.postalCode},{' '}
-                {shippingAddress.country}
+                {shippingAddress?.fullName}, {shippingAddress?.address},{' '}
+                {shippingAddress?.city}, {shippingAddress?.postalCode},{' '}
+                {shippingAddress?.country}
               </div>
               <div>
                 <Link href="/shipping">Edit</Link>
