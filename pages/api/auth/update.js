@@ -1,20 +1,20 @@
+import { unstable_getServerSession } from 'next-auth';
+import Nextauth from './[...nextauth]';
 import User from '@/model/User';
 import db from '@/utils/db';
 import bcryptjs from 'bcryptjs';
-
-import { getToken } from 'next-auth/jwt';
-
-async function handler(req, res) {
+const handler = async (req, res) => {
   if (req.method !== 'PUT') {
-    return res.status(400).send({ message: `${req.method} not supported` });
+    return res.status(400).json(`${req.method} is not supported`);
   }
-
-  const user = await getToken({ req });
-  console.log(user);
-  if (!user) {
-    return res.status(401).send({ message: 'signin required' });
+  const session = await unstable_getServerSession(req, res, Nextauth);
+  if (!session) {
+    return res.status(401).json('sign in requierd');
   }
-
+  await db.connect();
+  const { user } = session;
+  const findUser = await User.findOne({ email: user.email });
+  if (!findUser) return res.status(404).json('user is not found');
   const { name, email, password } = req.body;
 
   if (
@@ -28,21 +28,19 @@ async function handler(req, res) {
     });
     return;
   }
-
-  await db.connect();
-  const toUpdateUser = await User.findById(user._id);
-  toUpdateUser.name = name;
-  toUpdateUser.email = email;
-
-  if (password) {
-    toUpdateUser.password = bcryptjs.hashSync(password);
-  }
-
-  await toUpdateUser.save();
+  const salt = bcryptjs.genSaltSync(10);
+  const hash = bcryptjs.hashSync(req.body.password, salt);
+  await User.findByIdAndUpdate(
+    findUser._id,
+    {
+      $set: { ...req.body, password: hash },
+    },
+    {
+      new: true,
+    }
+  );
   await db.disconnect();
-  res.send({
-    message: 'User updated',
-  });
-}
+  res.status(200).json('user is update ');
+};
 
 export default handler;
