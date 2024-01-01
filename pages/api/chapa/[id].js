@@ -1,10 +1,11 @@
 import User from '@/model/User';
+import db from '@/utils/db';
 import axios from 'axios';
 
 const handler = async (req, res) => {
   if (req.method === 'POST') {
     const order = req.body;
-
+    await db.connect();
     const findUser = await User.findById(order.user);
     if (!findUser) {
       return res.status(404).json('user is not found');
@@ -43,6 +44,8 @@ const handler = async (req, res) => {
       .catch((err) => {
         console.log(err);
       });
+    await db.disconnect();
+    console.log('hy');
   }
 };
 export default handler;
