@@ -14,7 +14,7 @@ const handler = async (req, res) => {
     const name1 = findUser.name;
     const option = {
       headers: {
-        Authorization: 'Bearer CHASECK_TEST-5fAt1GxUTLgcv5nuq7lRPvfe3QWqjwRM',
+        Authorization: process.env.chapa_id,
         'Content-Type': 'application/json',
       },
     };
