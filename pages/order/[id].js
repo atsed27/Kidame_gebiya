@@ -1,12 +1,13 @@
 import Layout from '@/components/Layout';
 import { useRouter } from 'next/router';
-import React, { useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import axios from 'axios';
 import { getError } from '@/utils/error';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { toast } from 'react-toastify';
+import { Store } from '@/utils/Store';
 function reducer(state, action) {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -21,12 +22,15 @@ function reducer(state, action) {
       return { ...state, loadingPay: false, successPay: true };
     case 'PAY_FAIL':
       return { ...state, loadingPay: false, errorPay: action.payload };
+    case 'PAY_RESET':
+      return { ...state, loadingPay: false, successPay: false, errorPay: '' };
     default:
       state;
   }
 }
 
 function OrderScreen() {
+  const { state } = useContext(Store);
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
   const { query } = useRouter();
   const orderId = query.id;
@@ -37,6 +41,7 @@ function OrderScreen() {
       order: {},
     });
   useEffect(() => {
+    console.log(state.cart.paymentMethod);
     const fetchOrder = async () => {
       try {
         dispatch({ type: 'FETCH_REQUEST' });
@@ -51,23 +56,33 @@ function OrderScreen() {
     if (!order._id || successPay || (order._id && order._id !== orderId)) {
       fetchOrder();
       if (successPay) {
-        dispatch({ type: 'PAY_REST' });
+        dispatch({ type: 'PAY_RESET' });
       }
     } else {
-      const loadPaypalScript = async () => {
-        const { data: ClientId } = await axios.get('/api/keys/paypal');
-        paypalDispatch({
-          type: 'resetOptions',
-          value: {
-            'client-id': ClientId,
-            currency: 'USD',
-          },
-        });
-        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
-      };
-      loadPaypalScript();
+      if (state.cart.paymentMethod === 'paypal') {
+        const loadPaypalScript = async () => {
+          const { data: ClientId } = await axios.get('/api/keys/paypal');
+          paypalDispatch({
+            type: 'resetOptions',
+            value: {
+              'client-id': ClientId,
+              currency: 'USD',
+            },
+          });
+          paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+        };
+        loadPaypalScript();
+      } else {
+        console.log('other');
+      }
     }
-  }, [order._id, orderId, paypalDispatch, successPay]);
+  }, [
+    order._id,
+    orderId,
+    paypalDispatch,
+    state.cart.paymentMethod,
+    successPay,
+  ]);
 
   const {
     shippingAddress,
@@ -174,7 +189,7 @@ function OrderScreen() {
                   </tr>
                 </thead>
                 <tbody>
-                  {orderItems.map((item) => (
+                  {orderItems?.map((item) => (
                     <tr className="border-b" key={item._id}>
                       <td>
                         <Link href={`/product/${item.slug}`}>
