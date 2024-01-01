@@ -6,7 +6,7 @@ function ProductItem({ product, addToCart }) {
     <div className="card">
       <Link href={`product/${product.slug}`}>
         <img
-          className="rounded shadow"
+          className="rounded shadow h-[60%]"
           src={product.image}
           alt={product.name}
         />
