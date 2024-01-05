@@ -42,15 +42,11 @@ const handler = async (req, res) => {
         console.log(response.data);
         const orderFind = await Order.findById(order._id);
         if (!orderFind) response.status(404).json('order is not found');
-        await Order.findByIdAndUpdate(
-          order._id,
-          {
-            $set: {
-              tx_ref: tx,
-            },
+        await Order.findByIdAndUpdate(order._id, {
+          $set: {
+            tx_ref: tx,
           },
-          {}
-        );
+        });
         res.send(response.data);
       })
       .catch((err) => {
