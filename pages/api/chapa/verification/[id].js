@@ -1,9 +1,12 @@
 import Order from '@/model/Order';
+import db from '@/utils/db';
 import axios from 'axios';
 
 const chapaVerification = async (req, res) => {
   if (req.method === 'GET') {
     try {
+      await db.connect();
+
       let tx_ref = req.query.id;
       console.log(tx_ref);
       const option = {
@@ -30,6 +33,7 @@ const chapaVerification = async (req, res) => {
               new: true,
             }
           );
+          await db.disconnect();
           console.log(order);
           res.send(order);
         })
