@@ -32,7 +32,7 @@ const handler = async (req, res) => {
       last_name: name1,
       phone_number: '0916213371',
       tx_ref: tx,
-      callback_url: `http://localhost:3000/api/chapa/verification/${tx}`,
+      callback_url: `https://kidame-gebiya.vercel.app/api/chapa/verification/${tx}`,
       return_url: 'https://kidame-gebiya.vercel.app/',
     };
     await axios
