@@ -30,9 +30,9 @@ const handler = async (req, res) => {
       email: 'danielnigatu09@gmail.com',
       first_name: name1,
       last_name: name1,
-      phone_number: '0912345678',
+      phone_number: '0916213371',
       tx_ref: tx,
-      callback_url: 'https://webhook.site/077164d6-29cb-40df-ba29-8a00e59a7e60',
+      callback_url: `http://localhost:3000/api/chapa/verification/${tx}`,
       return_url: 'https://kidame-gebiya.vercel.app/',
     };
     await axios
