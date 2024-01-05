@@ -13,7 +13,7 @@ const Handler = async (req, res) => {
   if (!order) return res.status(404).json('order is not found');
   await db.disconnect();
   console.log(order);
-  return res.status(201).json(order);
+  return res.status(200).json(order);
 };
 
 export default Handler;

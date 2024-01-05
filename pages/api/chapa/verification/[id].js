@@ -20,7 +20,6 @@ const chapaVerification = async (req, res) => {
         .catch((err) => {
           console.log(err);
         });
-      console.log('ok');
     } catch (error) {
       console.log(error);
     }

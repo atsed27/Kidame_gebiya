@@ -1,3 +1,4 @@
+import Order from '@/model/Order';
 import User from '@/model/User';
 import db from '@/utils/db';
 import axios from 'axios';
@@ -37,8 +38,19 @@ const handler = async (req, res) => {
     };
     await axios
       .post('https://api.chapa.co/v1/transaction/initialize', data, option)
-      .then((response) => {
+      .then(async (response) => {
         console.log(response.data);
+        const orderFind = await Order.findById(order._id);
+        if (!orderFind) response.status(404).json('order is not found');
+        await Order.findByIdAndUpdate(
+          order._id,
+          {
+            $set: {
+              tx_ref: tx,
+            },
+          },
+          {}
+        );
         res.send(response.data);
       })
       .catch((err) => {
