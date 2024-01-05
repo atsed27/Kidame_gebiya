@@ -3,7 +3,7 @@ import axios from 'axios';
 const chapaVerification = async (req, res) => {
   if (req.method === 'GET') {
     try {
-      let tx_ref = req.params.id;
+      let tx_ref = req.query.id;
       console.log(tx_ref);
       const option = {
         headers: {
